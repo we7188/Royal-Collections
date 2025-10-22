@@ -21,7 +21,7 @@ def load_products():
     }
     # Prices in KES based on real market values
     prices = {
-        'galaxy 05.jpeg': 20000,
+        'galaxy A05s.jpeg': 20000,
         'hp laptop.jpeg': 50000,
         'laptop.jpeg': 40000,
         'redmi 15c.webp': 15000,
@@ -33,7 +33,7 @@ def load_products():
         'fridge.jpeg': 25000,
         'air force shoe.jpeg': 1500,
         'blow dry.jpeg': 5000,
-        'rubix cube.jpeg': 200,
+        'rubix cube.jpeg': 20,
         'water bottle.jpeg': 1000
     }
     images_dir = os.path.join(app.static_folder, 'images')
