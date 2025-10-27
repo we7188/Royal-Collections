@@ -12,6 +12,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 
 db.init_app(app)
 
+with app.app_context():
+    db.create_all()
+
 # Load products from static images folder with categories and prices
 def load_products():
     products = []
