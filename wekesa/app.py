@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import os
 from models import db, User, CartItem, Order, Contact
 
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ecommerce.db'
@@ -62,7 +64,7 @@ def index():
     cart_count = 0
     if 'user_id' in session:
         cart_count = CartItem.query.filter_by(user_id=session['user_id']).count()
-    return render_template('index.html', products=products, cart_count=cart_count)
+    return render_template('index.html', products=products_list, cart_count=cart_count)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -70,19 +72,17 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        user = User(username=username, email=email, password=password)
+        hashed_password = generate_password_hash(password)
+        user = User(username=username, email=email, password=hashed_password)
         try:
             db.session.add(user)
             db.session.commit()
             session['user_id'] = user.id
             flash('Registration successful!')
             return redirect(url_for('index'))
-        except Exception as e:
+        except IntegrityError:
             db.session.rollback()
-            if 'UNIQUE constraint failed' in str(e):
-                flash('Email already registered. Please use a different email.')
-            else:
-                flash('Registration failed. Please try again.')
+            flash('Username or email already registered. Please use a different one.')
             return redirect(url_for('register'))
     return render_template('register.html')
 
@@ -115,8 +115,8 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        user = User.query.filter_by(email=email, password=password).first()
-        if user:
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             flash('Login successful!')
             return redirect(url_for('index'))
