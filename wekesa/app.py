@@ -59,12 +59,16 @@ def load_products():
 
 products_list = load_products()
 
+@app.context_processor
+def inject_cart_count():
+    if 'user_id' in session:
+        count = CartItem.query.filter_by(user_id=session['user_id']).count()
+        return dict(cart_count=count)
+    return dict(cart_count=0)
+
 @app.route('/')
 def index():
-    cart_count = 0
-    if 'user_id' in session:
-        cart_count = CartItem.query.filter_by(user_id=session['user_id']).count()
-    return render_template('index.html', products=products_list, cart_count=cart_count)
+    return render_template('index.html', products=products_list)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -159,10 +163,7 @@ def contact():
         db.session.commit()
         flash('Thank you for contacting us! We will get back to you soon.')
         return redirect(url_for('index'))
-    cart_count = 0
-    if 'user_id' in session:
-        cart_count = CartItem.query.filter_by(user_id=session['user_id']).count()
-    return render_template('contact.html', cart_count=cart_count)
+    return render_template('contact.html')
 
 @app.route('/delete_from_cart/<int:item_id>')
 def delete_from_cart(item_id):
@@ -180,10 +181,4 @@ def orders():
     if 'user_id' not in session:
         return redirect(url_for('register'))
     orders = Order.query.filter_by(user_id=session['user_id']).all()
-    cart_count = CartItem.query.filter_by(user_id=session['user_id']).count()
-    return render_template('orders.html', orders=orders, cart_count=cart_count)
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    return render_template('orders.html', orders=orders)
