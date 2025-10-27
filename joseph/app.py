@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # Use environment variables for configuration, with defaults for local development
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///ecommerce.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///joseph.db')
 
 db.init_app(app)
 

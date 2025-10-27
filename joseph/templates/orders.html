@@ -3,25 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Royal Collection</title>
+    <title>Orders - Online Store Collections</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <header>
-        <h1>Royal Collection</h1>
+        <h1>Joseph</h1>
         <nav>
             <a href="{{ url_for('index') }}">Home</a>
             <a href="#help">Help Center</a>
             <a href="#contact">Contact Us</a>
             <a href="#shipping">Shipping & Delivery</a>
             <a href="#guide">Shopping Guide</a>
-            <a href="{{ url_for('register') }}">Register</a>
+            {% if session.user_id %}
+                <a href="{{ url_for('cart') }}">Cart</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
         </nav>
         <button id="dark-mode-toggle">Toggle Dark Mode</button>
     </header>
 
     <main>
-        <h2>Login</h2>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <ul class="flashes">
@@ -31,21 +36,32 @@
                 </ul>
             {% endif %}
         {% endwith %}
-        <form method="POST">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+
+        <section id="orders">
+            <h2>Your Orders</h2>
+            {% if orders %}
+                <div class="orders-list">
+                    {% for order in orders %}
+                    <div class="order">
+                        <h3>{{ order.product_name }}</h3>
+                        <p>Price: KES {{ "{:,}".format(order.price) }}</p>
+                        <p>Quantity: {{ order.quantity }}</p>
+                        <p>Total: KES {{ "{:,}".format(order.price * order.quantity) }}</p>
+                        <p>Order Date: {{ order.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>You have no orders yet.</p>
+            {% endif %}
+        </section>
     </main>
 
     <footer>
         <div class="footer-content">
             <div class="about">
-                <h3>About Royal Collection</h3>
-                <p>Royal Collection is your premier destination for high-quality products. We offer a wide range of items from electronics to home appliances, ensuring customer satisfaction and royal treatment.</p>
+                <h3>About Joseph</h3>
+                <p>Joseph is your premier destination for high-quality products. We offer a wide range of items from electronics to home appliances, ensuring customer satisfaction and excellent service.</p>
             </div>
             <div class="links">
                 <h3>Quick Links</h3>
@@ -57,7 +73,7 @@
                 </ul>
             </div>
         </div>
-        <p>&copy; 2025 Royal Collection. All rights reserved.</p>
+        <p>&copy; 2025 Joseph. All rights reserved.</p>
     </footer>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
