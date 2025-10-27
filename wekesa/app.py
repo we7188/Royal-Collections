@@ -55,9 +55,10 @@ def load_products():
                 })
     return products
 
+products_list = load_products()
+
 @app.route('/')
 def index():
-    products = load_products()
     cart_count = 0
     if 'user_id' in session:
         cart_count = CartItem.query.filter_by(user_id=session['user_id']).count()
@@ -96,8 +97,7 @@ def cart():
 def add_to_cart(product_name):
     if 'user_id' not in session:
         return redirect(url_for('register'))
-    products = load_products()
-    product = next((p for p in products if p['name'] == product_name), None)
+    product = next((p for p in products_list if p['name'] == product_name), None)
     if not product:
         flash('Product not found.')
         return redirect(url_for('index'))
